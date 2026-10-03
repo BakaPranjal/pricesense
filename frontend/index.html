@@ -53,6 +53,16 @@ details{margin-bottom:4px}summary{cursor:pointer;font-weight:800;padding:5px 0;c
 .pc-desc{margin:10px 0 0;font-size:12px;line-height:1.4;color:#5d5560}
 .rec-tip{display:flex;gap:10px;align-items:flex-start;margin-top:12px;padding:12px;border-radius:12px;background:#fbe9f3;border:1px solid #efd0e2;font-size:11.5px;line-height:1.4;color:#5d4a5a}.tip-ic{font-size:18px}
 @media(max-width:620px){.rec-head{flex-wrap:wrap}.rec-head h2{font-size:19px}.rec-pill{margin-left:60px}}
+
+/* --- v5: recommendation panel matched to design mockup --- */
+.hero{background:radial-gradient(circle at 0 0,rgba(123,63,228,.10),transparent 38%),linear-gradient(135deg,#fff 0%,#fdf6fb 55%,#f6eefc 100%);border:1.5px solid #d9c3ea;border-radius:24px;box-shadow:0 14px 34px rgba(108,18,81,.12)}.hero:before{display:none}
+.hero-main{background:rgba(255,255,255,.7);border:1px solid #ecdcf0;border-radius:18px;padding:18px}
+.price-card{border-top:4px solid #8a2a6e;border-radius:16px;padding-top:18px}.price-card.balanced{border:2px solid #d9a6c8;border-top:4px solid var(--plum);transform:translateY(-4px);box-shadow:0 12px 26px rgba(108,18,81,.16)}.price-card.balanced .pc-label{padding-right:0;margin-top:8px}
+.recommended-ribbon{top:-13px;right:auto;left:50%;transform:translateX(-50%);font-size:10px;padding:5px 14px;background:var(--plum);box-shadow:0 4px 10px rgba(108,18,81,.25)}
+.price-card .pc-tag{background:#fff;border-color:#e3b4d0}
+.rec-pill{display:inline-flex;align-items:center;gap:8px;background:#eefaf3;border-color:#bfe4cf}.rec-pill:before{content:"";width:16px;height:16px;border-radius:50%;border:3px solid var(--good);box-shadow:inset 0 0 0 3px #eefaf3,inset 0 0 0 9px var(--good)}
+.hero-side{background:linear-gradient(180deg,#fff6fb,#fbeaf4);border:1px solid #efc9e0}.hero-side .side-title{display:inline-flex;padding:8px 16px;border-radius:999px;background:#fbe3f0;border:1px solid #efbcd9;color:var(--plum);font-size:15px}.hero-side .side-title:after{content:"ⓘ";font-weight:600;color:#756d78;margin-left:4px}
+.kpi.snapshot{border-radius:14px;background:#fff;border:1px solid #efd3e4}.rec-tip{background:#fbe3f0;border-color:#efbcd9}
 </style></head><body>
 <header><b>PriceSense</b><button class="tab on" data-t="seller">Seller</button> <button class="tab" data-t="admin">Admin</button></header>
 <div class="banner">Demo only: all market data is synthetic and fees are assumptions, not official Meesho numbers.</div>
@@ -179,9 +189,9 @@ function render(r,b){
     <div class="side-title">Your market snapshot</div>
     <div class="market-grid">
       <div class="kpi snapshot"><div class="l">Comparable median</div><div class="v">${inr(m.stats.median)}</div><div class="n">Middle price of ${m.stats.n} similar products</div></div>
-      <div class="kpi snapshot"><div class="l">Your position</div><div class="v">${cvi.score.toFixed(0)}/100</div><div class="n">Modelled position vs similar sellers</div></div>
+      <div class="kpi snapshot"><div class="l">Your position</div><div class="v">${cvi.score.toFixed(0)}/100</div><div class="n">You rank higher than ${cvi.score.toFixed(0)}% of similar sellers</div></div>
       <div class="kpi snapshot"><div class="l">Price percentile</div><div class="v">${m.price_percentile==null?'–':m.price_percentile.toFixed(0)+'%'}</div><div class="n">${m.price_percentile==null?"":"Your price is higher than "+m.price_percentile.toFixed(0)+"% of similar products"}</div></div>
-      <div class="kpi snapshot"><div class="l">Expected orders</div><div class="v">${(r.expected_orders_current||0).toFixed(0)}</div><div class="n">Estimated monthly orders at your current price</div></div>
+      <div class="kpi snapshot"><div class="l">Expected orders</div><div class="v">${(((o.scenario_rows&&o.scenario_rows.BALANCED)||{}).expected_orders||r.expected_orders_current||0).toFixed(0)}</div><div class="n">Estimated monthly orders at this price range</div></div>
     </div>
     <div class="rec-tip"><span class="tip-ic">💡</span><span>This snapshot shows how your product compares to similar products in the market and your expected visibility and demand.</span></div>
    </div>
