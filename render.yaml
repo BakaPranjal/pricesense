@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: pricesense
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn backend.app:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: SELLER_ONLY
+        value: "1"
+      - key: PYTHON_VERSION
+        value: 3.11.9
