@@ -1,0 +1,267 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PriceSense — Marketplace pricing prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+:root{--plum:#6c1251;--deep:#560547;--cream:#fff3d7;--title:#1b1f4b;--ink:#28233a;--muted:#756d78;--line:#e7dccb;--soft:#f8eef4;--panel:#fffaf4;--good:#2d7754;--bad:#a33a4a}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{font-family:'Poppins',Arial,Helvetica,sans-serif;margin:0;background:linear-gradient(180deg,#fff7e8 0%,var(--cream) 100%);color:var(--ink);line-height:1.5}
+header{position:sticky;top:0;z-index:20;background:rgba(255,243,215,.94);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);padding:12px max(20px,calc((100vw - 1180px)/2));display:flex;align-items:center;gap:8px}header b{font-size:20px;color:var(--title);margin-right:auto;letter-spacing:-.02em}.tab{padding:8px 14px;border:1px solid #cbb9c3;border-radius:999px;background:rgba(255,255,255,.7);cursor:pointer;color:var(--title);font-weight:700}.tab.on{background:var(--plum);border-color:var(--plum);color:#fff}.banner{background:var(--deep);color:#fff6fb;border-bottom:1px solid var(--deep);padding:7px max(20px,calc((100vw - 1180px)/2));font-size:12px}
+main{max-width:1180px;margin:0 auto;padding:24px 18px 56px}.card{background:rgba(255,255,255,.96);border:1px solid var(--line);border-radius:18px;padding:20px;margin-bottom:18px;box-shadow:0 10px 28px rgba(86,5,71,.07)}
+h2{margin:0 0 10px;font-size:22px;line-height:1.25;color:var(--title);letter-spacing:-.02em}h3{margin:18px 0 9px;font-size:15px;color:var(--title)}
+.hero{background:linear-gradient(135deg,#fff 0%,#fff8ef 62%,#f8eef4 100%);border-color:#e1c9d8}.hero-layout{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(280px,.75fr);gap:18px;align-items:stretch}.hero-side{border:1px solid #eadce2;border-radius:15px;padding:16px;background:linear-gradient(180deg,#fffaf4 0%,#fdf4f8 100%)}.hero-side .side-title{font-weight:800;color:var(--title);margin-bottom:9px}
+.grid{display:grid;gap:12px}.g2{grid-template-columns:repeat(2,minmax(0,1fr))}.g3{grid-template-columns:repeat(3,minmax(0,1fr))}.g4{grid-template-columns:repeat(4,minmax(0,1fr))}
+label{font-size:12px;display:block;color:var(--title);font-weight:700}input,select{width:100%;padding:10px 11px;border:1px solid #d6c9c2;border-radius:10px;background:#fff;font-size:13px;margin-top:6px;outline:none;color:var(--ink)}input:focus,select:focus{border-color:var(--plum);box-shadow:0 0 0 3px rgba(108,18,81,.10)}
+button.p{background:var(--plum);color:#fff;border:0;border-radius:10px;padding:10px 18px;font-size:13px;font-weight:800;cursor:pointer;box-shadow:0 5px 15px rgba(108,18,81,.18)}button.p:hover{background:var(--deep)}button.s{padding:8px 11px;margin:0 4px 4px 0;cursor:pointer;border:1px solid #d7c4cf;border-radius:9px;background:#fff;color:var(--title);font-weight:700;font-size:12px}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.note{font-size:11px;color:var(--muted)}.big{font-size:28px;font-weight:800;color:var(--title)}.smallcaps{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--plum);font-weight:900;margin-bottom:4px}.tag{font-size:10px;border:1px solid #cbb9c3;padding:3px 7px;border-radius:999px;color:var(--plum);background:#fbf1f7;font-weight:700}
+.kpi{border:1px solid var(--line);padding:13px;border-radius:13px;background:var(--panel)}.kpi .l{font-size:11px;color:var(--muted)}.kpi .v{font-size:21px;font-weight:900;color:var(--title)}.kpi .n{font-size:11px;color:var(--muted)}
+.box{border:1px solid var(--line);padding:15px;border-radius:14px;text-align:left;background:var(--panel)}.box .price{font-size:25px;font-weight:900;color:var(--plum);margin:4px 0}.box .label{font-size:12px;font-weight:800;color:var(--title)}
+.scorebar{height:12px;background:#eee4dc;border-radius:999px;overflow:hidden;margin:9px 0 5px}.scorebar>span{display:block;height:100%;background:linear-gradient(90deg,var(--plum),var(--deep));border-radius:999px}.score-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.score-pill{border:1px solid var(--line);border-radius:12px;padding:12px;background:#fffaf4}.score-pill b{display:block;color:var(--title);margin-bottom:4px;font-size:12px}.score-pill>span{font-weight:900;color:var(--plum)}
+.split{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(300px,.85fr);gap:16px;align-items:start}.subcard{border:1px solid var(--line);border-radius:14px;padding:15px;background:#fff}.graph-wrap{padding:10px 4px 2px}canvas{max-height:360px}
+.ad-meter{margin:14px 0 5px}.meter-track{height:13px;background:#eee4dc;border-radius:999px;position:relative;overflow:visible}.meter-fill{height:100%;border-radius:999px;background:linear-gradient(90deg,#6c1251,#560547)}.meter-marker{position:absolute;top:-5px;width:2px;height:23px;background:var(--title)}.meter-labels{display:flex;justify-content:space-between;font-size:10px;color:var(--muted);margin-top:6px}.starter{border:1px solid #e2c7d6;background:#fbf1f7;border-radius:13px;padding:12px}.starter strong{color:var(--plum)}
+table{width:100%;border-collapse:separate;border-spacing:0;font-size:12px;overflow:hidden;border:1px solid var(--line);border-radius:12px}th,td{padding:9px 10px;border-bottom:1px solid #eee7df;text-align:right;background:#fff}th{font-size:11px;color:var(--title);background:#fbf6ee;font-weight:800}th:first-child,td:first-child{text-align:left}tr:last-child td{border-bottom:0}tr.hl td{background:var(--soft);font-weight:800}.neg{color:var(--bad)}.pos{color:var(--good)}
+details{margin-bottom:4px}summary{cursor:pointer;font-weight:800;padding:5px 0;color:var(--title)}.warn{background:#fff5e9;border:1px solid #ebd1aa;color:#664a24;padding:10px 12px;border-radius:11px;margin-bottom:10px;font-size:12px}.formula{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:10px;background:#fbf6ee;border-radius:8px;padding:7px 9px;color:#534b57;overflow:auto}.i{cursor:help}.sec{display:none}.sec.on{display:block}
+.section-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-end;margin-bottom:12px}.section-head .rightnote{font-size:11px;color:var(--muted);text-align:right}.muted-panel{background:#faf7f2;border:1px dashed #ded1ca;border-radius:12px;padding:11px}.compact{margin-bottom:10px}
+@media(max-width:900px){.hero-layout,.split{grid-template-columns:1fr}.score-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.g4{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:620px){main{padding:16px 12px 40px}.card{padding:16px}.g2,.g3,.g4,.score-grid{grid-template-columns:1fr}header{padding:10px 12px}.tab{padding:7px 10px}.section-head{display:block}.section-head .rightnote{text-align:left;margin-top:5px}}
+
+/* Recommendation visual polish */
+.hero{position:relative;overflow:hidden;padding:24px;border-radius:20px;background:radial-gradient(circle at 8% 0%,rgba(108,18,81,.09),transparent 30%),linear-gradient(135deg,#fff 0%,#fffaf3 55%,#faf0f6 100%);box-shadow:0 16px 38px rgba(86,5,71,.10)}
+.hero:before{content:"";position:absolute;left:0;top:0;bottom:0;width:6px;background:linear-gradient(180deg,var(--plum),var(--deep));border-radius:20px 0 0 20px}
+.hero-main{position:relative;z-index:1}
+.rec-eyebrow{display:inline-flex;align-items:center;gap:7px;padding:5px 10px;border-radius:999px;background:#f7eaf2;color:var(--plum);font-size:10px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px;border:1px solid #e7cfdd}
+.rec-eyebrow:before{content:"✦";font-size:11px}
+.rec-title{font-size:30px!important;line-height:1.08!important;margin:0 0 9px!important;color:var(--title)!important;letter-spacing:-.035em!important}
+.rec-range{color:var(--plum);font-weight:950;white-space:nowrap}
+.rec-subtitle{font-size:12px;color:#655d69;max-width:780px;margin:0 0 16px}
+.price-ladder{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:8px}
+.price-card{position:relative;padding:16px 15px 14px;border:1px solid #e1d1cc;border-radius:15px;background:rgba(255,255,255,.94);min-height:128px;transition:transform .15s ease,box-shadow .15s ease,border-color .15s ease}
+.price-card:hover{transform:translateY(-2px);box-shadow:0 10px 22px rgba(86,5,71,.10);border-color:#d4b7c8}
+.price-card .pc-label{font-size:11px;font-weight:850;color:var(--title);letter-spacing:.01em}
+.price-card .pc-price{font-size:27px;line-height:1.05;font-weight:950;color:var(--plum);margin:8px 0 10px}
+.price-card .pc-tag{display:inline-block;padding:4px 8px;border-radius:999px;background:#fbf1f7;border:1px solid #ddc5d3;color:var(--plum);font-size:10px;font-weight:800}
+.price-card.entry{border-top:4px solid #9b5b86}.price-card.growth{border-top:4px solid #7e2d68}.price-card.balanced{border-top:4px solid var(--plum);background:linear-gradient(180deg,#fff 0%,#fbf0f7 100%);box-shadow:0 10px 24px rgba(108,18,81,.11)}.price-card.balanced .pc-label{padding-right:86px}.price-card.profit{border-top:4px solid var(--deep)}
+.recommended-ribbon{position:absolute;top:-12px;right:10px;font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:.05em;color:#fff;background:var(--deep);padding:4px 7px;border-radius:999px}
+.hero-side{border:1px solid #e6d4df;border-radius:16px;padding:17px;background:linear-gradient(180deg,rgba(255,251,247,.98),rgba(251,240,246,.96));box-shadow:inset 0 1px 0 rgba(255,255,255,.7)}
+.hero-side .side-title{font-size:14px;font-weight:900;color:var(--title);display:flex;align-items:center;gap:7px}.hero-side .side-title:before{content:"◉";font-size:9px;color:var(--plum)}
+.market-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:11px}
+.kpi.snapshot{padding:14px;border-radius:14px;background:rgba(255,255,255,.86);border:1px solid #e8dcd4;min-height:92px}.kpi.snapshot .l{font-weight:700}.kpi.snapshot .v{font-size:24px;margin-top:2px}.kpi.snapshot .n{line-height:1.35}
+@media(max-width:1050px){.hero-layout{grid-template-columns:1fr}.price-ladder{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:620px){.rec-title{font-size:24px!important}.price-ladder{grid-template-columns:1fr}.market-grid{grid-template-columns:1fr}.hero{padding:18px}.hero:before{width:4px}}
+.rec-head{display:flex;align-items:center;gap:14px;margin-bottom:16px;position:relative;z-index:1}.rh-text{flex:1;min-width:0}.rec-head h2{margin:0;font-size:24px;letter-spacing:-.02em}.rh-most{color:var(--plum)}.rec-head p{margin:3px 0 0;font-size:13px;color:#655d69}
+.step-badge{flex:none;width:46px;height:46px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:900;font-size:22px;background:linear-gradient(135deg,#7b3fe4,var(--deep));box-shadow:0 6px 14px rgba(86,5,71,.25)}
+.rec-pill{flex:none;padding:9px 18px;border-radius:999px;background:#eaf7ef;border:1px solid #cfe9d9;color:var(--good);font-weight:800;font-size:15px}
+.pc-desc{margin:10px 0 0;font-size:12px;line-height:1.4;color:#5d5560}
+.rec-tip{display:flex;gap:10px;align-items:flex-start;margin-top:12px;padding:12px;border-radius:12px;background:#fbe9f3;border:1px solid #efd0e2;font-size:11.5px;line-height:1.4;color:#5d4a5a}.tip-ic{font-size:18px}
+@media(max-width:620px){.rec-head{flex-wrap:wrap}.rec-head h2{font-size:19px}.rec-pill{margin-left:60px}}
+</style></head><body>
+<header><b>PriceSense</b><button class="tab on" data-t="seller">Seller</button> <button class="tab" data-t="admin">Admin</button></header>
+<div class="banner">Demo only: all market data is synthetic and fees are assumptions, not official Meesho numbers.</div>
+<main>
+<section id="seller" class="sec on">
+ <div class="card"><h2>Let's price your product</h2>
+  <p><b>Your products:</b> <select id="prodsel" onchange="pickProd()" style="width:auto;min-width:240px"></select> <button class="s" onclick="saveProd()">Save this product</button> <button class="s" onclick="delProd()">Delete</button></p>
+  <p><b>Which one are you?</b><br>
+   <label><input type="radio" name="who" value="new" checked onchange="who()" style="width:auto"> I sell offline today / I'm new to Meesho (no online sales, ratings or returns yet)</label>
+   <label><input type="radio" name="who" value="old" onchange="who()" style="width:auto"> I already sell on Meesho</label></p>
+  <div class="grid g2" id="form"></div>
+  <p class="note" id="newnote">No history yet? No problem. We will estimate seller-quality inputs from similar listings. Packaging is not a separate seller input in this version.</p>
+  <div id="hist" style="display:none"><h3>Your Meesho history</h3><div class="grid g2" id="more"></div><p class="note">Leave a box empty if you don't know it; we will use typical values.</p></div>
+  <details><summary>Product category (optional)</summary><div class="grid g2" id="cat"></div></details>
+  <p><button class="p" onclick="analyze()">Analyze my price</button> <span class="note" id="status"></span></p></div>
+ <div id="out"></div>
+</section>
+<section id="admin" class="sec"><div class="sub" id="asub"></div><div id="aout"></div></section>
+</main>
+<script>
+const $=s=>document.querySelector(s), inr=(x,d=0)=>x==null?'–':(x<0?'-':'')+'₹'+Math.abs(x).toLocaleString('en-IN',{maximumFractionDigits:d,minimumFractionDigits:d}), pc=(x,d=0)=>x==null?'–':(x*100).toFixed(d)+'%';
+const cls=x=>x<0?'neg':'pos';let charts={};
+async function api(p,b){const r=await fetch('/api/'+p,b?{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(b)}:{});if(!r.ok)throw new Error(p+' '+r.status+' '+await r.text());return r.json()}
+const MAIN=[['product_name','Product name','text','Printed Cotton Kurti'],['weight_g','Packed weight (grams)','number',350],['current_price','Price you plan to sell at (₹)','number',349],['zone','Where do you deliver?','sel','Regional'],['shop_price','What you charge in your shop today (₹) — optional','number',''],['unit_cost','What one piece costs you (₹) — optional','number','']];
+const CAT=[['category','Category','text',"Women's Fashion"],['subcategory','Subcategory','text','Kurtis'],['product_type','Product type','text','Cotton Kurti'],['attributes','Key attributes','text','Printed, Regular fit'],['gst_registered','GST registered','sel','true']];
+const HIST=[['expected_monthly_orders','Orders per month you get now','number',220],['return_rate','Return rate %','number',8],['rto_rate','RTO rate %','number',7],['rating','Average rating','number',4.3],['review_count','Number of reviews','number',1240],['fulfilment_rate','Fulfilment %','number',97],['cancellation_rate','Seller cancellation %','number',1.5],['late_dispatch_rate','Late dispatch %','number',2],['ad_spend_monthly','Ad spend per month (₹)','number',8000]];
+const PCT=['return_rate','rto_rate','fulfilment_rate','cancellation_rate','late_dispatch_rate'];
+const fld=([k,l,t,v])=>t=='sel'?`<label>${l}<select id="f_${k}">${(k=='zone'?['Local','Regional','National']:['true','false']).map(o=>`<option ${o==v?'selected':''}>${o}</option>`).join('')}</select></label>`:`<label>${l}<input id="f_${k}" type="${t}" value="${v}" step="any"></label>`;
+$('#form').innerHTML=MAIN.map(fld).join('');$('#more').innerHTML=HIST.map(fld).join('');$('#cat').innerHTML=CAT.map(fld).join('');
+function isOld(){return document.querySelector('input[name=who]:checked').value=='old'}
+function who(){const o=isOld();$('#hist').style.display=o?'block':'none';$('#newnote').style.display=o?'none':'block'}
+function payload(){const b={},old=isOld();b.who=old?'old':'new';[...MAIN,...CAT,...(old?HIST:[])].forEach(([k,,t])=>{let v=$('#f_'+k).value;if(t=='number'){v=v===''?null:+v;if(v!=null&&PCT.includes(k))v/=100}else if(k=='gst_registered')v=v=='true';b[k]=v});if(!old)HIST.forEach(([k])=>b[k]=null);return b}
+function chart(id,cfg){if(charts[id])charts[id].destroy();charts[id]=new Chart($('#'+id),cfg)}
+
+if(typeof Chart!=='undefined'&&Chart.defaults)Chart.defaults.font.family="Poppins, Arial, sans-serif";
+let prods=[];const esc=t=>String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
+const BLANK={who:'new'};CAT.forEach(([k,,,v])=>BLANK[k]=v);
+async function loadProds(sel){prods=await api('products');$('#prodsel').innerHTML=prods.map(p=>`<option value="${p.id}">${esc(p.name)}</option>`).join('')+'<option value="new">+ Add a new product</option>';if(sel!=null)$('#prodsel').value=sel}
+function fill(pl){[...MAIN,...CAT,...HIST].forEach(([k,,t])=>{const el=$('#f_'+k);const v=pl?pl[k]:null;if(!el)return;if(v==null){if(t!='sel')el.value='';return}el.value=(t=='number'&&PCT.includes(k))?+(v*100).toFixed(4):String(v)});document.querySelector('input[name=who][value='+(pl&&pl.who=='old'?'old':'new')+']').checked=true;who()}
+function pickProd(){const v=$('#prodsel').value;if(v=='new'){fill(BLANK);$('#out').innerHTML='<div class="card">Fill in the boxes above for your new product, press <b>Analyze my price</b>, and then <b>Save this product</b> to keep it in the list.</div>';return}const p=prods.find(x=>x.id==v);if(p&&p.payload){fill(p.payload);analyze()}}
+async function saveProd(){const b=payload();if(!b.product_name){alert('Please give your product a name first.');return}const v=$('#prodsel').value;if(v!='new')b.id=+v;const r=await api('products',b);await loadProds(r.id);$('#status').textContent='Product saved.'}
+async function delProd(){const v=$('#prodsel').value;if(v=='new'||!confirm('Delete this product from your list?'))return;await fetch('/api/products/'+v,{method:'DELETE'});await loadProds();if(prods.length){$('#prodsel').value=prods[0].id;pickProd()}else{$('#prodsel').value='new';pickProd()}}
+let last=null;
+async function analyze(){const st=$('#status');st.textContent='Calculating…';try{const b=payload();if(b.current_price==null||b.weight_g==null){st.textContent='';$('#out').innerHTML='<div class="warn">Please fill in the packed weight and selling price, then press Analyze.</div>';return}last=await api('full-analysis',b);render(last,b);st.textContent=''}catch(e){st.textContent='';$('#out').innerHTML=`<div class="warn">${e.message}</div>`}}
+function detail(e){
+ const pd=e.penalty_detail||{}, fm=t=>e.fee_meta.find(x=>x.fee_type==t), sr=t=>{const x=fm(t);return x?x.source_type.replace(/_/g,' ')+', '+x.confidence+' confidence':'demo assumption'};
+ const R=(l,v,s)=>`<tr><td>${l}</td><td class="${v<0?'neg':'pos'}">${inr(v,2)}</td><td class="note">${s||''}</td></tr>`;
+ const H=(l,v)=>`<tr class="hl"><td>${l}</td><td class="${v<0?'neg':'pos'}">${inr(v,2)}</td><td></td></tr>`;
+ const T=(h,rows,n)=>`<h3>${h}</h3><table><tr><th>Item</th><th>₹ per order</th><th>How it is sourced</th></tr>${rows.join('')}</table><p class="note">${n}</p>`;
+ return T('A. Delivered order — how the payout is formed',[
+   R('Selling price',e.price,'Your listed selling price'),
+   R('− Commission',-e.commission,sr('commission')),
+   R('− Platform / service fee',-e.platform_fee,sr('platform_fee')),
+   R('− Forward shipping',-e.forward_shipping,`${sr('forward_shipping')} · based on zone + packed weight`),
+   R('− GST on applicable charges',-e.gst_on_fees,'Applied only to fee components marked GST-applicable'),
+   R('− TCS / TDS held back',-(e.tcs+e.tds),`${sr('tcs')} + ${sr('tds')}; this is a cash holdback, not necessarily a permanent cost`),
+   H('Estimated cash payout for a delivered order',e.estimated_settlement)
+ ],'The payout is shown separately from your own product cost so the seller can see exactly what the marketplace deducts.');
+}
+function keepCard(r){
+ const fp=r.price_floor||{},st=r.settlement||{},br=r.offline_bridge||{},sc=r.scenarios,L=br.ledger,r5=x=>Math.round(x/5)*5,N={ENTRY:'Entry',GROWTH:'Growth',BALANCED:'Balanced',PROFIT:'Profit'};
+ const bal=fp.scenarios&&fp.scenarios.BALANCED; if(!bal||!st.BALANCED)return '';
+ const sg=v=>(v<0?'−':'+')+inr(Math.abs(v)),cl=v=>v<0?'neg':'pos',n0=x=>Math.round(x);
+ let h='<div class="card">';
+ if(L){const win=L.per_order>=0;
+  h+=`<h2>Will you make money at ${inr(L.price)}?</h2><p style="font-size:1.25em"><b class="${cl(L.per_order)}">${win?'Yes — you earn about '+inr(L.per_order)+' per order':'No — you lose about '+inr(-L.per_order)+' per order'}</b> <span class="note">(your cost ${inr(L.unit_cost)} per piece)</span></p>
+  <p>A delivered order leaves you about <b>${inr(L.delivered_unit)}</b> above your cost. But not every order is delivered, so look at 100 orders:</p>
+  <table><tr><th>Out of 100 orders</th><th>How many</th><th>You gain / lose</th></tr>
+  <tr><td>Delivered</td><td>${n0(L.n_delivered)}</td><td class="pos">${sg(L.delivered_total)}</td></tr>
+  <tr><td>Returned by customer</td><td>${n0(L.n_return)}</td><td class="neg">${sg(L.return_total)}</td></tr>
+  <tr><td>Refused / not delivered (RTO)</td><td>${n0(L.n_rto)}</td><td class="neg">${sg(L.rto_total)}</td></tr>
+  <tr><td>Penalties</td><td></td><td class="neg">${sg(L.penalties)}</td></tr>
+  ${L.ads?`<tr><td>Ads</td><td></td><td class="neg">${sg(L.ads)}</td></tr>`:''}
+  <tr class="hl"><td>Total for 100 orders</td><td></td><td class="${cl(L.total)}">${sg(L.total)}</td></tr></table>
+  <p>${win?'You stay above break-even down to':'To stop losing money, sell above about'} <b>${inr(L.break_even_price)}</b>.</p>
+  ${L.tax_held>0.5?`<p class="note">Delivered orders count the ${inr(L.tax_held,2)} tax holdback as money you get back later (cash in hand is about ${inr(L.cash_unit)} per delivered order).</p>`:''}`;
+ }else{
+  h+=`<h2>What you keep</h2><p>At the <b>Balanced price ${inr(sc.BALANCED)}</b>, about <b>${inr(st.BALANCED.delivered)}</b> reaches your bank for each delivered order.</p><p>Of every ₹100 you charge, about <b>₹${n0(bal.leak_per100)}</b> goes to shipping, fees, returns and ads. Your cost per piece (product + packing) must be below about <b>₹${r5(bal.max_cost)}</b> to make a profit.</p><p class="note">Want to see your exact profit? Type what one piece costs you in the optional box above and press Analyze.</p>`;
+ }
+ const pr=br.profit_per_order;
+ h+=`<h3>Other prices you could choose</h3><table><tr><th>Price</th><th>In your bank (delivered)</th><th>Goes out, per ₹100</th><th>Your cost must be</th>${pr?'<th>Profit per order</th>':''}</tr>`+['ENTRY','GROWTH','BALANCED','PROFIT'].map(k=>{const f=fp.scenarios[k];if(!f)return '';const v=pr?pr[k]:null;
+  return `<tr><td>${N[k]} ${inr(sc[k])}</td><td>${inr(st[k].delivered)}</td><td>about ₹${n0(f.leak_per100)}</td><td>under ₹${r5(f.max_cost)}</td>${v!=null?`<td class="${cl(v)}">${sg(v)}</td>`:''}</tr>`}).join('')+'</table>';
+ if(br.shop_price)h+=`<h3>Your shop vs online</h3><p>In your shop you charge ${inr(br.shop_price)}. Online, similar items mostly sell for ${inr(br.online_low)} – ${inr(br.online_high)} (middle ${inr(br.median)}), so your shop price is ${Math.abs(n0(br.shop_vs_median_pct))}% ${br.shop_vs_median_pct>=0?'above':'below'} the middle. At your shop price you would receive about ${inr(br.payout_at_shop_price)} per delivered order.</p>`;
+ return h+'<p class="note">Estimates from illustrative fee assumptions, not official Meesho rates; check the Supplier Panel. Your shop price and cost never change the recommended prices.</p></div>'}
+function render(r,b){
+ const e=r.economics,o=r.optimization,sc=r.scenarios,m=r.benchmark,cb=r.competitive_comparables||[],ad=r.ad_benchmark||{},sq=r.seller_quality,cvi=r.cvi;
+ const warn=o.constraints_relaxed
+   ? '<div class="warn">No price met every visibility/demand guardrail, so the broadest feasible range is shown.</div>'
+   : '';
+ const scoreExplain=[
+   ['Price competitiveness',cvi.parts.price_competitiveness,'Your price relative to the comparable market range.'],
+   ['Seller quality',cvi.parts.seller_quality,'Rating, fulfilment and service history—or category priors for a new seller.'],
+   ['Review strength',cvi.parts.review_strength,'How much review proof you have versus similar sellers.'],
+   ['Return health',cvi.parts.return_health,'Lower return rates strengthen this signal.'],
+   ['RTO health',cvi.parts.rto_health,'Lower RTO rates strengthen this signal.'],
+   ['Fulfilment',cvi.parts.fulfilment,'Higher fulfilment strengthens this signal.']
+ ];
+ const topAbove=cb.filter(x=>x.score>cvi.score).sort((a,b)=>b.score-a.score).slice(0,5);
+ const whyAbove=(x)=>x.reasons&&x.reasons.length?x.reasons.slice(0,3).join(' · '):'Stronger overall competitive signals';
+ const fmtSpend=x=>x==null?'–':inr(x);
+ const adRows=ad.p25!=null?[
+   ['Lower spend',ad.p25,'25th percentile'],['Typical spend',ad.p50,'Median'],['Higher spend',ad.p75,'75th percentile']
+ ]:[];
+ const meterMax=ad.p75||ad.p50||1;
+ const marker25=ad.p25!=null?Math.max(2,Math.min(98,100*ad.p25/meterMax)):0;
+ const marker50=ad.p50!=null?Math.max(2,Math.min(98,100*ad.p50/meterMax)):0;
+ const suggested=ad.p50!=null?Math.round((ad.p25+ad.p50)/2):null;
+ $('#out').innerHTML=warn+keepCard(r)+`
+ <div class="card hero">
+  <div class="rec-head"><span class="step-badge">2</span><div class="rh-text"><h2>Recommended Price Range <span class="rh-most">(Most Important)</span></h2><p>A clear price range based on market data, seller quality, order economics and demand signals.</p></div><span class="rec-pill">◉ Balanced</span></div>
+  <div class="hero-layout">
+   <div class="hero-main">
+    <div class="rec-eyebrow">PriceSense recommendation</div>
+    <h2 class="rec-title">Recommended selling range: <span class="rec-range">${inr(r.recommended_range[0])} – ${inr(r.recommended_range[1])}</span></h2>
+    <p class="rec-subtitle">Built from comparable prices, expected demand and your modelled competitive position. No product sourcing cost or profit input is required.</p>
+    <div class="price-ladder">
+      <div class="price-card entry"><div class="pc-label">Entry Price</div><div class="pc-price">${inr(sc.ENTRY)}</div><span class="pc-tag">Lowest viable point</span><p class="pc-desc">Use if you want to gain initial visibility and orders.</p></div>
+      <div class="price-card growth"><div class="pc-label">Growth Price</div><div class="pc-price">${inr(sc.GROWTH)}</div><span class="pc-tag">More visibility</span><p class="pc-desc">A competitive price to increase order volume.</p></div>
+      <div class="price-card balanced"><span class="recommended-ribbon">Recommended</span><div class="pc-label">Balanced Price</div><div class="pc-price">${inr(sc.BALANCED)}</div><span class="pc-tag">Best balance</span><p class="pc-desc">Recommended for a balance of growth and profitability.</p></div>
+      <div class="price-card profit"><div class="pc-label">Profit Price</div><div class="pc-price">${inr(sc.PROFIT)}</div><span class="pc-tag">Higher-price scenario</span><p class="pc-desc">Use if your focus is higher margin even with lower order volume.</p></div>
+    </div>
+   </div>
+   <div class="hero-side">
+    <div class="side-title">Your market snapshot</div>
+    <div class="market-grid">
+      <div class="kpi snapshot"><div class="l">Comparable median</div><div class="v">${inr(m.stats.median)}</div><div class="n">Middle price of ${m.stats.n} similar products</div></div>
+      <div class="kpi snapshot"><div class="l">Your position</div><div class="v">${cvi.score.toFixed(0)}/100</div><div class="n">Modelled position vs similar sellers</div></div>
+      <div class="kpi snapshot"><div class="l">Price percentile</div><div class="v">${m.price_percentile==null?'–':m.price_percentile.toFixed(0)+'%'}</div><div class="n">${m.price_percentile==null?"":"Your price is higher than "+m.price_percentile.toFixed(0)+"% of similar products"}</div></div>
+      <div class="kpi snapshot"><div class="l">Expected orders</div><div class="v">${(r.expected_orders_current||0).toFixed(0)}</div><div class="n">Estimated monthly orders at your current price</div></div>
+    </div>
+    <div class="rec-tip"><span class="tip-ic">💡</span><span>This snapshot shows how your product compares to similar products in the market and your expected visibility and demand.</span></div>
+   </div>
+  </div>
+ </div>
+ <div class="card">
+  <div class="section-head"><div><div class="smallcaps">Competitive position</div><h2>Your position: ${cvi.score.toFixed(0)}/100</h2></div><div class="rightnote">Price on X-axis · Competitive position on Y-axis</div></div>
+  <div class="scorebar"><span style="width:${Math.max(0,Math.min(100,cvi.score))}%"></span></div>
+  <p class="note">This is a PriceSense modelled proxy, not Meesho's internal ranking score.</p>
+  <div class="split" style="margin-top:14px">
+   <div class="subcard graph-wrap"><h3 style="margin-top:2px">Competitive graph</h3><canvas id="c1"></canvas><p class="note">Each dot is a synthetic comparable. Your dot is highlighted. The graph lets a seller read price and competitive position together.</p></div>
+   <div class="subcard"><h3 style="margin-top:2px">Why did you get this score?</h3><div class="score-grid" style="grid-template-columns:1fr 1fr">${scoreExplain.map(([n,v,why])=>`<div class="score-pill"><b>${n}</b><span>${(v*100).toFixed(0)}/100</span><div class="note" style="margin-top:3px">${why}</div></div>`).join('')}</div></div>
+  </div>
+  <h3>Why are the sellers above you above you?</h3>
+  ${topAbove.length?`<table><tr><th>Seller</th><th>Price</th><th>Position</th><th>Why above you</th></tr>${topAbove.map(x=>`<tr><td>${x.seller_name}</td><td>${inr(x.price)}</td><td>${x.score.toFixed(0)}/100</td><td style="text-align:left">${whyAbove(x)}</td></tr>`).join('')}</table>`:'<div class="muted-panel note">No comparable seller in the selected set scores above you.</div>'}
+  <details style="margin-top:10px"><summary>What would improve your position?</summary><ul>${scoreExplain.map(([n,v,why])=>`<li><b>${n}:</b> ${why}</li>`).join('')}</ul></details>
+ </div>
+ <div class="card">
+  <div class="section-head"><div><div class="smallcaps">Marketplace deductions</div><h2>What Meesho deducts from one delivered order</h2></div><div class="rightnote">Delivered orders only. Returns and RTOs are in the card above.</div></div>
+  <div class="grid g3 compact">
+   <div class="kpi"><div class="l">Listed price</div><div class="v">${inr(e.price)}</div><div class="n">Starting point</div></div>
+   <div class="kpi"><div class="l">Marketplace deductions</div><div class="v neg">−${inr(e.price-e.estimated_settlement)}</div><div class="n">fees, shipping, tax holdbacks</div></div>
+   <div class="kpi"><div class="l">Estimated payout</div><div class="v pos">${inr(e.estimated_settlement)}</div><div class="n">after listed deductions</div></div>
+  </div>
+  <table>${[['Selling price',e.price,'Starting point'],['− Commission',-e.commission,'Marketplace fee'],['− Platform / service fee',-e.platform_fee,'Marketplace fee'],['− Forward shipping',-e.forward_shipping,'Depends on zone + packed weight'],['− GST on applicable charges',-e.gst_on_fees,'Applied only to relevant fee components'],['− TCS / TDS held back',-(e.tcs+e.tds),'Cash holdback; recovery depends on tax treatment'],['= Estimated delivered-order payout',e.estimated_settlement,'Estimated cash payout']].map((x,i)=>`<tr class="${i==6?'hl':''}"><td>${x[0]}</td><td class="${x[1]<0?'neg':'pos'}">${inr(x[1],2)}</td><td class="note">${x[2]}</td></tr>`).join('')}</table>
+  <details style="margin-top:10px"><summary>See the deduction logic line by line</summary>${detail(e)}
+   <h3>B. Returns and RTO — expected impact</h3><table><tr><th>Event</th><th>Chance</th><th>Typical marketplace-side cost</th><th>How the model uses it</th></tr>
+   <tr><td>Customer return</td><td>${pc(e.p_return)}</td><td>${inr(e.expected_return_cost/e.p_return||0,2)}</td><td>Chance × return-related charges/recovery assumption</td></tr>
+   <tr><td>RTO</td><td>${pc(e.p_rto)}</td><td>${inr(e.expected_rto_cost/e.p_rto||0,2)}</td><td>Chance × forward/reverse/RTO charges + recovery assumption</td></tr></table>
+   <p class="formula">Expected impact = event probability × per-event marketplace-side cost.</p>
+  </details>
+ </div>
+ <div class="card">
+  <div class="section-head"><div><div class="smallcaps">Advertising benchmark</div><h2>How much should a new seller spend on ads?</h2></div><div class="rightnote">Compared with similar synthetic category observations</div></div>
+  ${ad.p50!=null?`<div class="split"><div>
+    <div class="starter"><strong>Starter guidance: ${fmtSpend(ad.p25)} – ${fmtSpend(ad.p50)} / month</strong><div class="note" style="margin-top:4px">A new seller can begin below the category median, then increase only when ads generate useful orders.</div></div>
+    <div class="ad-meter"><div class="meter-track"><div class="meter-fill" style="width:${Math.max(marker50,8)}%"></div><span class="meter-marker" style="left:${marker25}%"></span><span class="meter-marker" style="left:${marker50}%"></span></div><div class="meter-labels"><span>₹0</span><span>25th: ${fmtSpend(ad.p25)}</span><span>50th: ${fmtSpend(ad.p50)}</span><span>75th: ${fmtSpend(ad.p75)}</span></div></div>
+   </div><div class="subcard"><h3 style="margin-top:0">Where others spend</h3><table>${adRows.map(x=>`<tr><td>${x[0]}</td><td>${fmtSpend(x[1])}</td><td class="note">${x[2]}</td></tr>`).join('')}</table><p class="note">${ad.n} synthetic historical observations were used.</p></div></div>`:'<div class="muted-panel note">No comparable ad-spend observations were available for this category.</div>'}
+ </div>
+ <details class="card"><summary>More model details</summary>
+  <h3>Price options</h3><table><tr><th>Option</th><th>Price</th><th>Expected orders</th><th>Competitive position</th><th>Use when</th><th>Confidence</th></tr>
+  ${[['ENTRY','Entry Price','Lowest viable point','Starting with traction'],['GROWTH','Growth Price','Higher visibility / order growth','Scale order volume'],['BALANCED','Balanced Price','Recommended balance','Primary recommendation'],['PROFIT','Profit Price','Higher-price scenario','Test higher-price positioning']].map(([k,label,descriptor,use])=>{const c=o.scenario_rows[k]||o.candidates.find(x=>x.price===sc[k]);return `<tr><td><b>${label}</b><div class="note">${descriptor}</div></td><td>${inr(c?.price)}</td><td>${c?.expected_orders?.toFixed(0)||'–'}</td><td>${c?.cvi?.toFixed(0)||'–'}/100</td><td>${use}</td><td>${c?.confidence||'–'}</td></tr>`}).join('')}</table>
+  <p class="note">Profit Price is a pricing scenario for testing a higher selling price. It does not require the seller to enter product cost or disclose their profit.</p>
+  <h3>What the model is using</h3><ul><li>Comparable listing prices and seller-quality signals.</li><li>Return/RTO and fulfilment history where available; otherwise category priors.</li><li>Ad-spend history from similar synthetic observations for the benchmark above.</li></ul>
+ </details>`;
+ const P=o.candidates.map(c=>c.price);
+ const pts=cb.map(x=>({x:x.price,y:x.score,label:x.seller_name}));
+ const allX=pts.length?pts.map(p=>p.x):P, minX=Math.min(...allX), maxX=Math.max(...allX);
+ chart('c1',{type:'scatter',data:{datasets:[
+   {label:'Comparable sellers',data:pts,backgroundColor:'#a85f92',borderColor:'#a85f92',pointRadius:5,pointHoverRadius:7},
+   {label:'You',data:[{x:e.price,y:cvi.score}],backgroundColor:'#560547',borderColor:'#fff3d7',pointBorderWidth:3,pointRadius:11,pointHoverRadius:13,pointStyle:'star'}
+ ]},options:{responsive:true,plugins:{legend:{position:'top',labels:{usePointStyle:true,boxWidth:8}},tooltip:{callbacks:{label:(ctx)=>ctx.datasetIndex===1?`You: ₹${ctx.raw.x}, ${ctx.raw.y.toFixed(0)}/100`:`${ctx.raw.label||'Comparable'}: ₹${ctx.raw.x}, ${ctx.raw.y.toFixed(0)}/100`}}},scales:{x:{type:'linear',min:Math.max(0,minX*0.9),max:maxX*1.1,grid:{color:'#efe5de'},title:{display:true,text:'Selling price (₹)'}},y:{min:0,max:100,grid:{color:'#efe5de'},title:{display:true,text:'Competitive position (0–100)'}}}}});
+}
+// ---------------- Admin ----------------
+const ASEC=['Dataset Explorer','Fee Rules','Competitor Benchmark','Seller Quality Model','Demand Model','Model Assumptions','Data Confidence','Synthetic Data Generator'];
+$('#asub').innerHTML=ASEC.map((s,i)=>`<button class="s" onclick="adm(${i})">${s}</button>`).join('');
+document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('on',x==b));document.querySelectorAll('.sec').forEach(x=>x.classList.toggle('on',x.id==b.dataset.t));if(b.dataset.t=='admin')adm(0)});
+const NOTE='<div class="note">Illustrative synthetic data for demonstration purposes.</div>';
+async function adm(i){const A=$('#aout');A.innerHTML='<div class="card">Loading…</div>';
+ try{if(i==0){const s=await api('dataset-summary'),c=(await api('competitors')).rows;A.innerHTML=`<div class="card"><h2>Dataset Explorer</h2>${NOTE}<div class="grid g4"><div class="kpi"><div class="l">Synthetic listings</div><div class="v">${s.total}</div></div></div><canvas id="d1"></canvas><table><tr><th>Category</th><th>Listings</th><th>Avg price</th><th>Avg rating</th><th>Avg reviews</th><th>Avg return</th><th>Avg RTO</th></tr>${s.by_category.map(x=>`<tr><td>${x.category}</td><td>${x.n}</td><td>${inr(x.avg_price)}</td><td>${x.avg_rating.toFixed(2)}</td><td>${x.avg_reviews.toFixed(0)}</td><td>${pc(x.avg_return,1)}</td><td>${pc(x.avg_rto,1)}</td></tr>`).join('')}</table>
+ <h3>Listings (filter)</h3><div class="row"><input id="fc" placeholder="Category contains…" style="width:200px" oninput="fl()"><input id="fp" type="number" placeholder="Min price" style="width:120px" oninput="fl()"><input id="fr" type="number" placeholder="Max return %" style="width:130px" oninput="fl()"></div><div style="max-height:360px;overflow:auto"><table id="lt"></table></div></div>`;
+  window._c=c;fl();chart('d1',{type:'bar',data:{labels:c.map(x=>x.price),datasets:[{label:'Price distribution (all listings)',data:c.map(x=>x.price)}]},options:{plugins:{legend:{display:false}}}});
+  const bins={};c.forEach(x=>{const k=Math.floor(x.price/50)*50;bins[k]=(bins[k]||0)+1});chart('d1',{type:'bar',data:{labels:Object.keys(bins).map(k=>'₹'+k),datasets:[{label:'Listings per price band',data:Object.values(bins),backgroundColor:'#5b3df5'}]}})}
+ if(i==1){const r=(await api('fee-rules')).sort((a,b)=>a.fee_type.localeCompare(b.fee_type)||(a.zone||'').localeCompare(b.zone||'')||(a.weight_min||0)-(b.weight_min||0));window._fr=r;
+  A.innerHTML=`<div class="card"><h2>Fee rules</h2><p class="note">Change any box, then press "Save all changes". Amounts are in ₹, rates in %. Untick "On" to switch a fee off. All values are assumptions. When you enter a real number from your Meesho statement, set Type to seller_reported — it then overrides the others.</p>
+  <div style="overflow:auto"><table><tr><th>Fee</th><th>Zone</th><th>Weight (g)</th><th>Amount ₹</th><th>Rate %</th><th>GST on fee</th><th>On</th><th>Type</th><th>Confidence</th><th>Notes</th></tr>
+  ${r.map(x=>`<tr><td>${x.fee_type}</td><td>${x.zone||'–'}</td><td>${x.weight_min!=null?x.weight_min+'–'+x.weight_max:'–'}</td><td><input id="a${x.id}" type="number" step="any" value="${x.amount??''}" style="width:80px"></td><td><input id="r${x.id}" type="number" step="any" value="${x.rate==null?'':+(x.rate*100).toFixed(4)}" style="width:70px"></td><td><input id="g${x.id}" type="checkbox" style="width:auto" ${x.gst_applicable?'checked':''}></td><td><input id="e${x.id}" type="checkbox" style="width:auto" ${x.enabled?'checked':''}></td><td><select id="t${x.id}">${['third_party','model_assumption','seller_reported','official'].map(o=>`<option ${o==x.source_type?'selected':''}>${o}</option>`).join('')}</select></td><td><select id="c${x.id}">${['high','medium','low'].map(o=>`<option ${o==x.confidence?'selected':''}>${o}</option>`).join('')}</select></td><td><input id="n${x.id}" type="text" value="${(x.notes||'').replace(/"/g,'&quot;')}" style="width:220px"></td></tr>`).join('')}</table></div>
+  <p><button class="p" onclick="saveFees()">Save all changes</button> <span id="fs" class="note"></span></p></div>`}
+ if(i==2){const b=await api('market-benchmark?price='+($('#f_current_price').value||349));A.innerHTML=`<div class="card"><h2>Competitor Benchmark</h2>${NOTE}<p>Comparable selection: ${b.level}. n=${b.stats?.n}</p><table>${Object.entries(b.stats||{}).map(([k,v])=>`<tr><td>${k}</td><td>${v.toFixed?v.toFixed(1):v}</td></tr>`).join('')}</table><p>Price percentile of ₹${b.price}: ${b.price_percentile?.toFixed(0)}</p></div>`}
+ if(i==3){const c=await api('model-config'),q=last?last.seller_quality:null;A.innerHTML=`<div class="card"><h2>Seller Quality Model <span class="tag w">modelled — not Meesho's score</span></h2><p class="note">Adjusted rating = v/(v+m)·R + m/(v+m)·C; review strength = log(1+reviews) normalised; health = 1 − rate/(2·category median). Edit weights, save, then re-run Analyze.</p><table><tr><th>Component</th><th>Weight</th><th>Current value</th><th>Points</th></tr>${Object.entries(c.quality_weights).map(([k,v])=>{const x=q&&q.components.find(z=>z.name==k);return`<tr><td>${k}</td><td><input id="qw_${k}" type="number" step="0.01" value="${v}" style="width:80px"></td><td>${x?x.value.toFixed?x.value.toFixed(3):x.value:'run analysis'}</td><td>${x?x.points.toFixed(1):'–'}</td></tr>`}).join('')}</table><button class="s" onclick="svw('quality_weights','qw_')">Save quality weights</button><h3>CVI weights</h3><table>${Object.entries(c.cvi_weights).map(([k,v])=>`<tr><td>${k}</td><td><input id="cw_${k}" type="number" step="0.01" value="${v}" style="width:80px"></td></tr>`).join('')}</table><button class="s" onclick="svw('cvi_weights','cw_')">Save CVI weights</button></div>`}
+ if(i==4){const m=await api('model-metrics');A.innerHTML=`<div class="card"><h2>Demand model (simple rules)</h2><p>${m.rule_model_form}</p><table>${Object.entries(m.params).map(([k,v])=>`<tr><td>${k}</td><td>${v}</td></tr>`).join('')}</table><p class="note">${m.note} Change these numbers in "Model Assumptions".</p></div>`}
+ if(i==5){const c=await api('model-config');A.innerHTML=`<div class="card"><h2>Model Assumptions registry <span class="tag w">demo assumptions</span></h2><table><tr><th>Name</th><th>Value</th><th>Source</th><th>Confidence</th><th>Editable</th></tr>${Object.entries(c.params).filter(([k,v])=>typeof v=='number'||v===null).map(([k,v])=>`<tr><td>${k}</td><td><input id="pm_${k}" type="number" step="any" value="${v??''}" style="width:90px"></td><td>model_assumption</td><td>low</td><td>yes</td></tr>`).join('')}</table><button class="s" onclick="svp()">Save assumptions</button><p class="note">Fee-related assumptions (commission, platform fee, shipping, GST, TCS/TDS, RTO reverse, penalties) live in Fee Rules.</p></div>`}
+ if(i==6){A.innerHTML=last?`<div class="card"><h2>Data Confidence</h2>${['economic','market','demand'].map(k=>`<p><b>${k}</b>: ${last.confidence[k].level}<br><span class="note">${last.confidence[k].why}</span></p>`).join('')}</div>`:'<div class="card">Run an analysis first.</div>'}
+ if(i==7){const d=await api('demo-data');A.innerHTML=`<div class="card"><h2>Synthetic Data Generator</h2>${NOTE}<p>${d.counts.competitors} listings · ${d.counts.observations} historical observations (fixed seed 42).</p><div class="row"><input id="sd" type="number" value="42" style="width:100px"><button class="s" onclick="regen()">Regenerate with seed</button></div><h3>Data sources</h3><table>${d.sources.map(s=>`<tr><td>${s.name}</td><td>${s.source_type}</td><td style="text-align:left">${s.description}</td></tr>`).join('')}</table></div>`}
+ }catch(e){A.innerHTML=`<div class="warn">${e.message}</div>`}}
+function fl(){const c=(window._c||[]).filter(x=>(!$('#fc').value||x.category.toLowerCase().includes($('#fc').value.toLowerCase()))&&(!$('#fp').value||x.price>=+$('#fp').value)&&(!$('#fr').value||x.return_rate*100<=+$('#fr').value));$('#lt').innerHTML='<tr><th>Seller (synthetic)</th><th>Category</th><th>Type</th><th>Price</th><th>Rating</th><th>Reviews</th><th>Return</th><th>RTO</th></tr>'+c.map(x=>`<tr><td>${x.seller_name}</td><td>${x.category}</td><td>${x.product_type}</td><td>${inr(x.price)}</td><td>${x.rating}</td><td>${x.review_count}</td><td>${pc(x.return_rate,1)}</td><td>${pc(x.rto_rate,1)}</td></tr>`).join('')}
+async function saveFees(){const n=v=>v===''?null:+v;let c=0;for(const x of window._fr){const g=k=>document.querySelector('#'+k+x.id);const t=g('t').value;const body={id:x.id,amount:n(g('a').value),rate:n(g('r').value)==null?null:n(g('r').value)/100,gst_applicable:+g('g').checked,enabled:+g('e').checked,source_type:t,confidence:g('c').value,notes:g('n').value,status:t=='seller_reported'?'seller_actual':(x.status=='seller_actual'?'indicative':x.status)};await api('admin/fee-rules',body);c++}document.querySelector('#fs').textContent='Saved. Now press "Analyze my price" on the Seller tab to see the effect.'}
+async function svw(key,pre){const v={};document.querySelectorAll(`[id^=${pre}]`).forEach(x=>v[x.id.slice(pre.length)]=+x.value);await api('admin/model-config',{key,value:v});alert('Saved. Re-run Analyze.')}
+async function svp(){const v={};document.querySelectorAll('[id^=pm_]').forEach(x=>{v[x.id.slice(3)]=x.value===''?null:+x.value});await api('admin/model-config',{key:'params',value:v});alert('Saved. Re-run Analyze.')}
+async function regen(){await fetch('/api/admin/regenerate-data?seed_value='+$('#sd').value,{method:'POST'});adm(7)}
+loadProds().then(()=>{if(prods.length){$('#prodsel').value=prods[0].id;pickProd()}else analyze()});
+fetch('/api/mode').then(r=>r.json()).then(m=>{if(m.seller_only)document.querySelector('[data-t=admin]').style.display='none'}).catch(()=>{});
+</script></body></html>
