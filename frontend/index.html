@@ -47,6 +47,12 @@ details{margin-bottom:4px}summary{cursor:pointer;font-weight:800;padding:5px 0;c
 .kpi.snapshot{padding:14px;border-radius:14px;background:rgba(255,255,255,.86);border:1px solid #e8dcd4;min-height:92px}.kpi.snapshot .l{font-weight:700}.kpi.snapshot .v{font-size:24px;margin-top:2px}.kpi.snapshot .n{line-height:1.35}
 @media(max-width:1050px){.hero-layout{grid-template-columns:1fr}.price-ladder{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:620px){.rec-title{font-size:24px!important}.price-ladder{grid-template-columns:1fr}.market-grid{grid-template-columns:1fr}.hero{padding:18px}.hero:before{width:4px}}
+.rec-head{display:flex;align-items:center;gap:14px;margin-bottom:16px;position:relative;z-index:1}.rh-text{flex:1;min-width:0}.rec-head h2{margin:0;font-size:24px;letter-spacing:-.02em}.rh-most{color:var(--plum)}.rec-head p{margin:3px 0 0;font-size:13px;color:#655d69}
+.step-badge{flex:none;width:46px;height:46px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:900;font-size:22px;background:linear-gradient(135deg,#7b3fe4,var(--deep));box-shadow:0 6px 14px rgba(86,5,71,.25)}
+.rec-pill{flex:none;padding:9px 18px;border-radius:999px;background:#eaf7ef;border:1px solid #cfe9d9;color:var(--good);font-weight:800;font-size:15px}
+.pc-desc{margin:10px 0 0;font-size:12px;line-height:1.4;color:#5d5560}
+.rec-tip{display:flex;gap:10px;align-items:flex-start;margin-top:12px;padding:12px;border-radius:12px;background:#fbe9f3;border:1px solid #efd0e2;font-size:11.5px;line-height:1.4;color:#5d4a5a}.tip-ic{font-size:18px}
+@media(max-width:620px){.rec-head{flex-wrap:wrap}.rec-head h2{font-size:19px}.rec-pill{margin-left:60px}}
 </style></head><body>
 <header><b>PriceSense</b><button class="tab on" data-t="seller">Seller</button> <button class="tab" data-t="admin">Admin</button></header>
 <div class="banner">Demo only: all market data is synthetic and fees are assumptions, not official Meesho numbers.</div>
@@ -156,26 +162,28 @@ function render(r,b){
  const suggested=ad.p50!=null?Math.round((ad.p25+ad.p50)/2):null;
  $('#out').innerHTML=warn+keepCard(r)+`
  <div class="card hero">
+  <div class="rec-head"><span class="step-badge">2</span><div class="rh-text"><h2>Recommended Price Range <span class="rh-most">(Most Important)</span></h2><p>A clear price range based on market data, seller quality, order economics and demand signals.</p></div><span class="rec-pill">◉ Balanced</span></div>
   <div class="hero-layout">
    <div class="hero-main">
     <div class="rec-eyebrow">PriceSense recommendation</div>
     <h2 class="rec-title">Recommended selling range: <span class="rec-range">${inr(r.recommended_range[0])} – ${inr(r.recommended_range[1])}</span></h2>
     <p class="rec-subtitle">Built from comparable prices, expected demand and your modelled competitive position. No product sourcing cost or profit input is required.</p>
     <div class="price-ladder">
-      <div class="price-card entry"><div class="pc-label">Entry Price</div><div class="pc-price">${inr(sc.ENTRY)}</div><span class="pc-tag">Lowest viable point</span></div>
-      <div class="price-card growth"><div class="pc-label">Growth Price</div><div class="pc-price">${inr(sc.GROWTH)}</div><span class="pc-tag">More visibility</span></div>
-      <div class="price-card balanced"><span class="recommended-ribbon">Recommended</span><div class="pc-label">Balanced Price</div><div class="pc-price">${inr(sc.BALANCED)}</div><span class="pc-tag">Best balance</span></div>
-      <div class="price-card profit"><div class="pc-label">Profit Price</div><div class="pc-price">${inr(sc.PROFIT)}</div><span class="pc-tag">Higher-price scenario</span></div>
+      <div class="price-card entry"><div class="pc-label">Entry Price</div><div class="pc-price">${inr(sc.ENTRY)}</div><span class="pc-tag">Lowest viable point</span><p class="pc-desc">Use if you want to gain initial visibility and orders.</p></div>
+      <div class="price-card growth"><div class="pc-label">Growth Price</div><div class="pc-price">${inr(sc.GROWTH)}</div><span class="pc-tag">More visibility</span><p class="pc-desc">A competitive price to increase order volume.</p></div>
+      <div class="price-card balanced"><span class="recommended-ribbon">Recommended</span><div class="pc-label">Balanced Price</div><div class="pc-price">${inr(sc.BALANCED)}</div><span class="pc-tag">Best balance</span><p class="pc-desc">Recommended for a balance of growth and profitability.</p></div>
+      <div class="price-card profit"><div class="pc-label">Profit Price</div><div class="pc-price">${inr(sc.PROFIT)}</div><span class="pc-tag">Higher-price scenario</span><p class="pc-desc">Use if your focus is higher margin even with lower order volume.</p></div>
     </div>
    </div>
    <div class="hero-side">
     <div class="side-title">Your market snapshot</div>
     <div class="market-grid">
-      <div class="kpi snapshot"><div class="l">Comparable median</div><div class="v">${inr(m.stats.median)}</div><div class="n">${m.stats.n} comparable listings</div></div>
-      <div class="kpi snapshot"><div class="l">Your position</div><div class="v">${cvi.score.toFixed(0)}/100</div><div class="n">modelled competitive proxy</div></div>
-      <div class="kpi snapshot"><div class="l">Price percentile</div><div class="v">${m.price_percentile==null?'–':m.price_percentile.toFixed(0)+'%'}</div><div class="n">of comparable prices</div></div>
-      <div class="kpi snapshot"><div class="l">Expected orders</div><div class="v">${(r.expected_orders_current||0).toFixed(0)}</div><div class="n">modelled monthly baseline</div></div>
+      <div class="kpi snapshot"><div class="l">Comparable median</div><div class="v">${inr(m.stats.median)}</div><div class="n">Middle price of ${m.stats.n} similar products</div></div>
+      <div class="kpi snapshot"><div class="l">Your position</div><div class="v">${cvi.score.toFixed(0)}/100</div><div class="n">Modelled position vs similar sellers</div></div>
+      <div class="kpi snapshot"><div class="l">Price percentile</div><div class="v">${m.price_percentile==null?'–':m.price_percentile.toFixed(0)+'%'}</div><div class="n">${m.price_percentile==null?"":"Your price is higher than "+m.price_percentile.toFixed(0)+"% of similar products"}</div></div>
+      <div class="kpi snapshot"><div class="l">Expected orders</div><div class="v">${(r.expected_orders_current||0).toFixed(0)}</div><div class="n">Estimated monthly orders at your current price</div></div>
     </div>
+    <div class="rec-tip"><span class="tip-ic">💡</span><span>This snapshot shows how your product compares to similar products in the market and your expected visibility and demand.</span></div>
    </div>
   </div>
  </div>
