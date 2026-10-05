@@ -17,15 +17,6 @@ Tests: `pytest -q`. Reset data: delete `data/pricesense.db` or use Admin → Syn
 - `backend/seed.py` seeded generator (fee rules, 120+ listings); `backend/db.py` SQLite schema
 - `backend/service.py` orchestration; `backend/app.py` FastAPI; `frontend/index.html` Seller + Admin UI; `tests/`
 
-## Key formulas
-- Delivered payout = P − commission − platform fee − shipping − GST on applicable fees − TCS/TDS holdbacks
-- Return impact = event probability × return-related shipping/recovery assumptions; RTO impact uses the corresponding forward/reverse/handling assumptions
-- Competitive position combines price competitiveness with seller-quality, review, return, RTO and fulfilment signals
-- Ad benchmark uses synthetic historical observations from the same category/subcategory to show 25th/50th/75th percentile monthly spend
-- Adjusted rating = v/(v+m)·R + m/(v+m)·C; review strength = log(1+reviews) normalised; health = 1 − rate/(2·category median)
-- Rule demand: Orders(P) = base × (P/median)^−e(P) × quality × ads × season, calibrated to your expected orders at current price
-- Price scenarios: lower-entry, recommended and upper-band prices are shown without exposing a profit calculation to the seller
-
 ## Known limitations
 Meesho's ranking formula and settlement data are unknown; fee rules are editable assumptions (Fee Rules tab; seller_reported rules override). Demand is hypothetical until trained on real data.
 Reverse-shipping, TCS/TDS rates and penalties are model assumptions — verify in the Supplier Panel. Not implemented: auth, real integrations, retraining, A/B tests (architect-only).
